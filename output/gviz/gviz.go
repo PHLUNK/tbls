@@ -235,3 +235,9 @@ func outputErExists(s *schema.Schema, erFormat, path string) bool {
 	}
 	return false
 }
+
+// OutputFunction output Graphviz format for function (not supported).
+func (g *Gviz) OutputFunction(wr io.Writer, f *schema.Function) error {
+	// Graphviz format does not support individual function output
+	return nil
+}

@@ -29,3 +29,13 @@ func (j *YAML) OutputTable(wr io.Writer, t *schema.Table) error {
 	}
 	return nil
 }
+
+// OutputFunction output YAML format for function.
+func (j *YAML) OutputFunction(wr io.Writer, f *schema.Function) error {
+	encoder := yaml.NewEncoder(wr)
+	err := encoder.Encode(f)
+	if err != nil {
+		return err
+	}
+	return nil
+}

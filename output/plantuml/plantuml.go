@@ -102,3 +102,9 @@ func (p *PlantUML) OutputTable(wr io.Writer, t *schema.Table) error {
 
 	return nil
 }
+
+// OutputFunction output PlantUML format for function (not supported).
+func (p *PlantUML) OutputFunction(wr io.Writer, f *schema.Function) error {
+	// PlantUML format does not support individual function output
+	return nil
+}

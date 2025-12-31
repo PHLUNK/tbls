@@ -42,3 +42,15 @@ func (j *JSON) OutputTable(wr io.Writer, t *schema.Table) error {
 	}
 	return nil
 }
+
+// OutputFunction output JSON format for function.
+func (j *JSON) OutputFunction(wr io.Writer, f *schema.Function) error {
+	encoder := json.NewEncoder(wr)
+	if !j.inline {
+		encoder.SetIndent("", "  ")
+	}
+	if err := encoder.Encode(f); err != nil {
+		return err
+	}
+	return nil
+}

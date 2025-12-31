@@ -102,3 +102,9 @@ func (m *Mermaid) OutputTable(wr io.Writer, t *schema.Table) error {
 
 	return nil
 }
+
+// OutputFunction output Mermaid format for function (not supported).
+func (m *Mermaid) OutputFunction(wr io.Writer, f *schema.Function) error {
+	// Mermaid format does not support individual function output
+	return nil
+}

@@ -98,3 +98,9 @@ func (c *Config) OutputSchema(wr io.Writer, s *schema.Schema) error {
 func (c *Config) OutputTable(_ io.Writer, _ *schema.Table) error {
 	return errors.New("not supported")
 }
+
+// OutputFunction output config format for function (not supported).
+func (c *Config) OutputFunction(wr io.Writer, f *schema.Function) error {
+	// Config format does not support individual function output
+	return nil
+}

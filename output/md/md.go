@@ -101,6 +101,22 @@ func (m *Md) OutputTable(wr io.Writer, t *schema.Table) error {
 	return nil
 }
 
+// OutputFunction output md format for function.
+func (m *Md) OutputFunction(wr io.Writer, f *schema.Function) error {
+	ts, err := m.functionTemplate()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	tmpl := template.Must(template.New(f.Name).Funcs(output.Funcs(&m.config.MergedDict)).Parse(ts))
+	templateData := m.makeFunctionTemplateData(f)
+
+	if err := tmpl.Execute(wr, templateData); err != nil {
+		return errors.WithStack(err)
+	}
+
+	return nil
+}
+
 // OutputViewpoint output md format for viewpoint.
 func (m *Md) OutputViewpoint(wr io.Writer, i int, v *schema.Viewpoint) error {
 	ts, err := m.viewpointTemplate()
@@ -195,6 +211,24 @@ func Output(s *schema.Schema, c *config.Config, force bool) (e error) {
 			return errors.WithStack(err)
 		}
 		fmt.Printf("%s\n", filepath.Join(docPath, fn))
+		if err := f.Close(); err != nil {
+			return errors.WithStack(err)
+		}
+	}
+
+	// functions
+	for _, fn := range s.Functions {
+		filename := fmt.Sprintf("%s.md", fn.Name)
+		f, err := os.Create(filepath.Clean(filepath.Join(fullPath, filename)))
+		if err != nil {
+			_ = f.Close()
+			return errors.WithStack(err)
+		}
+		if err := md.OutputFunction(f, fn); err != nil {
+			_ = f.Close()
+			return errors.WithStack(err)
+		}
+		fmt.Printf("%s\n", filepath.Join(docPath, filename))
 		if err := f.Close(); err != nil {
 			return errors.WithStack(err)
 		}
@@ -422,6 +456,37 @@ func DiffSchemaAndDocs(docPath string, s *schema.Schema, c *config.Config) (stri
 		diffed[fn] = struct{}{}
 	}
 
+	// functions
+	for _, f := range s.Functions {
+		buf := new(bytes.Buffer)
+		to := fmt.Sprintf("%s %s", mdsn, f.Name)
+		if err := md.OutputFunction(buf, f); err != nil {
+			return "", errors.WithStack(err)
+		}
+		fn := fmt.Sprintf("%s.md", f.Name)
+		targetPath := filepath.Join(fullPath, fn)
+		a, err := os.ReadFile(filepath.Clean(targetPath))
+		if err != nil {
+			a = []byte{}
+		}
+		from := filepath.Join(docPath, fn)
+
+		d := difflib.UnifiedDiff{
+			A:        difflib.SplitLines(string(a)),
+			B:        difflib.SplitLines(buf.String()),
+			FromFile: from,
+			ToFile:   to,
+			Context:  3,
+		}
+
+		text, _ := difflib.GetUnifiedDiffString(d)
+		if text != "" {
+			diff += fmt.Sprintf("diff '%s' '%s'\n", from, to)
+			diff += text
+		}
+		diffed[fn] = struct{}{}
+	}
+
 	files, err := os.ReadDir(fullPath)
 	if err != nil {
 		return "", errors.WithStack(err)
@@ -486,6 +551,21 @@ func (m *Md) tableTemplate() (string, error) {
 		return string(tb), nil
 	}
 	tb, err := m.tmpl.ReadFile("templates/table.md.tmpl")
+	if err != nil {
+		return "", errors.WithStack(err)
+	}
+	return string(tb), nil
+}
+
+func (m *Md) functionTemplate() (string, error) {
+	if m.config.Templates.MD.Function != "" {
+		tb, err := os.ReadFile(m.config.Templates.MD.Function)
+		if err != nil {
+			return "", errors.WithStack(err)
+		}
+		return string(tb), nil
+	}
+	tb, err := m.tmpl.ReadFile("templates/function.md.tmpl")
 	if err != nil {
 		return "", errors.WithStack(err)
 	}
@@ -747,6 +827,12 @@ func (m *Md) makeTableTemplateData(t *schema.Table) map[string]interface{} {
 	}
 }
 
+func (m *Md) makeFunctionTemplateData(f *schema.Function) map[string]interface{} {
+	return map[string]interface{}{
+		"Function": f,
+	}
+}
+
 func (m *Md) makeViewpointTemplateData(v *schema.Viewpoint) (map[string]interface{}, error) {
 	number := m.config.Format.Number
 	adjust := m.config.Format.Adjust
@@ -858,8 +944,9 @@ func (m *Md) functionsData(functions []*schema.Function, number, adjust bool) []
 	)
 
 	for _, f := range functions {
+		name := fmt.Sprintf("[%s](%s%s.md)", f.Name, m.config.BaseURL, mdurl.Encode(f.Name))
 		d := []string{
-			f.Name,
+			name,
 			f.ReturnType,
 			f.Arguments,
 			f.Type,
@@ -998,6 +1085,12 @@ func outputExists(s *schema.Schema, path string) bool {
 	// tables
 	for _, t := range s.Tables {
 		if _, err := os.Lstat(filepath.Join(path, fmt.Sprintf("%s.md", t.Name))); err == nil {
+			return true
+		}
+	}
+	// functions
+	for _, f := range s.Functions {
+		if _, err := os.Lstat(filepath.Join(path, fmt.Sprintf("%s.md", f.Name))); err == nil {
 			return true
 		}
 	}

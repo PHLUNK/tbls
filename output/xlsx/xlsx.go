@@ -303,3 +303,9 @@ func setStringWithBorder(sheet *excl.Sheet, rowNo int, colNo int, v string) *exc
 // 		Bottom: &excl.BorderSetting{Style: "thin"},
 // 	})
 // }
+
+// OutputFunction output xlsx format for function (not supported).
+func (x *Xlsx) OutputFunction(wr io.Writer, f *schema.Function) error {
+	// XLSX format does not support individual function output
+	return nil
+}

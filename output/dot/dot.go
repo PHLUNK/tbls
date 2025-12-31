@@ -161,3 +161,9 @@ func (d *Dot) tableTemplate() (string, error) {
 	}
 	return string(tb), nil
 }
+
+// OutputFunction output dot format for function (not supported).
+func (d *Dot) OutputFunction(wr io.Writer, f *schema.Function) error {
+	// Dot format does not support individual function output
+	return nil
+}
