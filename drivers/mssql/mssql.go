@@ -510,7 +510,8 @@ const query = `SELECT SCHEMA_NAME(obj.schema_id) AS schema_name,
 		WHEN 'X' THEN 'Extended stored procedure'
 	END AS type,
 	TYPE_NAME(ret.user_type_id) AS return_type,
-	SUBSTRING(par.parameters, 0, LEN(par.parameters)) AS parameters
+	SUBSTRING(par.parameters, 0, LEN(par.parameters)) AS parameters,
+	mod.definition
 FROM sys.objects obj
 JOIN sys.sql_modules mod
 ON mod.object_id = obj.object_id
@@ -540,8 +541,9 @@ func (m *Mssql) getFunctions() ([]*schema.Function, error) {
 			typeValue  string
 			returnType sql.NullString
 			arguments  sql.NullString
+			definition sql.NullString
 		)
-		err := functionsResult.Scan(&schemaName, &name, &typeValue, &returnType, &arguments)
+		err := functionsResult.Scan(&schemaName, &name, &typeValue, &returnType, &arguments, &definition)
 		if err != nil {
 			return functions, errors.WithStack(err)
 		}
@@ -550,6 +552,7 @@ func (m *Mssql) getFunctions() ([]*schema.Function, error) {
 			Type:       typeValue,
 			ReturnType: returnType.String,
 			Arguments:  arguments.String,
+			Def:        definition.String,
 		}
 
 		functions = append(functions, function)
