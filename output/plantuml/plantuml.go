@@ -84,6 +84,7 @@ func (p *PlantUML) OutputTable(wr io.Writer, t *schema.Table) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	tables = output.AppendReferencedTables(tables)
 	ts, err := p.tableTemplate()
 	if err != nil {
 		return errors.WithStack(err)

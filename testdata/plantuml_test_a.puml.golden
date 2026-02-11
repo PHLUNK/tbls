@@ -24,4 +24,6 @@ table("b", "b") {
 ' relations
 "b" }|--|| "a" : "FOREIGN KEY (b) REFERENCES &#34;a&#34;(a)"
 
+' referenced tables
+
 @enduml

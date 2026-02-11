@@ -63,6 +63,7 @@ func (d *Dot) OutputTable(wr io.Writer, t *schema.Table) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	tables = output.AppendReferencedTables(tables)
 
 	ts, err := d.tableTemplate()
 	if err != nil {

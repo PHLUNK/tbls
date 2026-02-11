@@ -18,4 +18,6 @@ digraph "table a b" {
 
   // Relations
   "b":"b" -> "a":"a" [dir=back, arrowtail=crow,  taillabel=<<table cellpadding="5" border="0" cellborder="0"><tr><td>FOREIGN KEY (b) REFERENCES &#34;a&#34;(a)</td></tr></table>>];
+
+  // Referenced Tables
 }

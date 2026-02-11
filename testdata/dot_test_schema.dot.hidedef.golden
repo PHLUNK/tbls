@@ -22,4 +22,8 @@ digraph "testschema" {
 
   // Relations
   "b":"b" -> "a":"a" [dir=back, arrowtail=crow,  taillabel=<<table cellpadding="5" border="0" cellborder="0"><tr><td></td></tr></table>>];
+
+  // Referenced Tables
+  "view" -> "a" [style="dashed", arrowhead=none, taillabel=<<table cellpadding="5" border="0" cellborder="0"><tr><td></td></tr></table>>];
+  "view" -> "b" [style="dashed", arrowhead=none, taillabel=<<table cellpadding="5" border="0" cellborder="0"><tr><td></td></tr></table>>];
 }
