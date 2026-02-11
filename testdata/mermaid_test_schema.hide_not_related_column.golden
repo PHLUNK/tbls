@@ -1,6 +1,8 @@
 erDiagram
 
 "b" }|--|| "a" : "FOREIGN KEY (b) REFERENCES #quot;a#quot;(a)"
+"view" }o..o{ "a" : "references"
+"view" }o..o{ "b" : "references"
 
 "a" {
   INTEGER a PK

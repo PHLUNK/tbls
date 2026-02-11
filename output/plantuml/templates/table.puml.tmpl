@@ -43,4 +43,9 @@ view("{{ $t.Name }}", "{{ $t.Name }}{{ if $sc }}{{ if ne $t.Comment "" }}\n{{ $t
 "{{ $r.Table.Name }}" {{ $r.Cardinality | lcardi }}--{{ $r.ParentCardinality | rcardi }} "{{ $r.ParentTable.Name }}" : "{{ if $sd }}{{ $r.Def | html }}{{ end }}"
 {{- end }}
 
+' referenced tables
+{{- range $j, $rt := .Table.ReferencedTables }}
+"{{ $.Table.Name }}" }o..o{ "{{ $rt.Name }}" : "references"
+{{- end }}
+
 @enduml

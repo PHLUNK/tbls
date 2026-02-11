@@ -84,6 +84,7 @@ func (m *Mermaid) OutputTable(wr io.Writer, t *schema.Table) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	tables = output.AppendReferencedTables(tables)
 	ts, err := m.tableTemplate()
 	if err != nil {
 		return errors.WithStack(err)

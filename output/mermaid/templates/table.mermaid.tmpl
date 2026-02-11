@@ -5,6 +5,9 @@ erDiagram
 {{- if $r.HideForER }}{{ continue }}{{ end }}
 "{{ $r.Table.Name }}" {{ $r.Cardinality | lcardi }}--{{ $r.ParentCardinality | rcardi }} "{{ $r.ParentTable.Name }}" : "{{ if $sd }}{{ $r.Def | escape_nl | escape_double_quote }}{{ end }}"
 {{- end }}
+{{- range $j, $rt := .Table.ReferencedTables }}
+"{{ $.Table.Name }}" }o..o{ "{{ $rt.Name }}" : "references"
+{{- end }}
 
 "{{ .Table.Name }}" {
 {{- range $i, $c := .Table.Columns }}

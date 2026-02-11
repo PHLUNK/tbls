@@ -27,4 +27,8 @@ view("view", "view") {
 ' relations
 "b" }|--|| "a" : ""
 
+' referenced tables
+"view" }o..o{ "a" : "references"
+"view" }o..o{ "b" : "references"
+
 @enduml

@@ -101,6 +101,24 @@ func ShowOnlyFirstParagraph(text string) string {
 	return splitted[0]
 }
 
+// AppendReferencedTables appends referenced tables from the collected tables
+// that are not already present in the tables list.
+func AppendReferencedTables(tables []*schema.Table) []*schema.Table {
+	encountered := make(map[string]bool)
+	for _, t := range tables {
+		encountered[t.Name] = true
+	}
+	for _, t := range tables {
+		for _, rt := range t.ReferencedTables {
+			if !encountered[rt.Name] {
+				encountered[rt.Name] = true
+				tables = append(tables, rt)
+			}
+		}
+	}
+	return tables
+}
+
 func LabelJoin(labels schema.Labels) string {
 	if len(labels) == 0 {
 		return ""
